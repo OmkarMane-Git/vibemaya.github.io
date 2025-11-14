@@ -1,9 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ga-id="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Vibemaya - Future hub for tech insights, automation solutions, and software development services">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <meta property="og:title" content="Vibemaya — Tech Insights & Automation">
+    <meta property="og:description" content="Future hub for tech insights, automation solutions, and software development services.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vibemaya.dev/">
+    <meta property="og:image" content="https://vibemaya.dev/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vibemaya — Tech Insights & Automation">
+    <meta name="twitter:description" content="Future hub for tech insights, automation solutions, and software development services.">
+    <meta name="twitter:image" content="https://vibemaya.dev/og-image.png">
+    <link rel="canonical" href="https://vibemaya.dev/">
+    <meta name="robots" content="index, follow">
+    <!-- Google Analytics (disabled until data-ga-id is set on <html>) -->
+    <script>
+        (function () {
+            var GA_MEASUREMENT_ID = document.documentElement.dataset.gaId;
+            if (!GA_MEASUREMENT_ID) {
+                console.info('Google Analytics disabled: set data-ga-id on <html> to enable tracking.');
+                return;
+            }
+            var gtagScript = document.createElement('script');
+            gtagScript.async = true;
+            gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+            document.head.appendChild(gtagScript);
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', GA_MEASUREMENT_ID);
+        })();
+    </script>
     <title>Vibemaya - Tech Insights & Automation Solutions</title>
     <style>
         * {
@@ -66,6 +97,7 @@
             color: var(--text-primary);
             background: linear-gradient(135deg, var(--text-primary), var(--accent));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -117,6 +149,16 @@
             .nav-toggle {
                 display: block;
             }
+        }
+
+        .skip-link:focus {
+            position: static !important;
+            width: auto !important;
+            height: auto !important;
+            padding: 0.75rem 1rem;
+            background: var(--accent);
+            color: #fff;
+            z-index: 1001;
         }
 
         /* Hero Section */
@@ -303,23 +345,24 @@
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo">Vibemaya</a>
-            <button class="nav-toggle" id="navToggle">☰</button>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#blog">Blog</a></li>
-                <li><a href="#contact-footer">Contact</a></li>
+    <a class="skip-link" href="#main" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+        Skip to main content
+    </a>
+    <nav class="navbar nav" aria-label="Main navigation">
+        <div class="nav-inner nav-container" style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:1rem;">
+            <a href="/" style="color:var(--text-primary);font-weight:700;text-decoration:none;">Vibemaya</a>
+            <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">☰</button>
+            <ul class="nav-links" id="navLinks" style="gap:1rem;">
+                <li><a href="#about" style="color:var(--text-secondary);text-decoration:none;">About</a></li>
+                <li><a href="#services" style="color:var(--text-secondary);text-decoration:none;">Services</a></li>
+                <li><a href="#blog" style="color:var(--text-secondary);text-decoration:none;">Blog</a></li>
+                <li><a href="#contact" style="color:var(--text-secondary);text-decoration:none;">Contact</a></li>
             </ul>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="main">
         <div class="hero-content">
             <h1>Vibemaya</h1>
             <p class="tagline">Future Hub for Tech Insights & Automation Solutions</p>
@@ -327,6 +370,13 @@
                 Empowering businesses and developers with cutting-edge technology insights, 
                 intelligent automation solutions, and innovative software development services.
             </p>
+            <div class="email-subscription">
+                <form class="email-form" id="emailForm" method="POST" action="https://formspree.io/f/">
+                    <!-- TODO: Replace with your Formspree form ID -->
+                    <input type="email" name="email" class="email-input" placeholder="Email address" required aria-label="Email address for updates">
+                    <button type="submit" class="btn-subscribe">Notify Me</button>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -373,7 +423,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer" id="contact-footer">
+    <footer class="footer" id="contact">
         <div class="footer-content">
             <div class="footer-section">
                 <h3>Vibemaya</h3>
@@ -386,18 +436,43 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Vibemaya. All rights reserved.</p>
+            <p>&copy; <span id="year"></span> Vibemaya. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
-        // Mobile navbar toggle
-        const navToggle = document.getElementById("navToggle");
-        const navLinks = document.getElementById("navLinks");
-        navToggle.addEventListener("click", () => {
-            navLinks.classList.toggle("active");
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+                navToggle.setAttribute('aria-expanded', String(!isExpanded));
+                navLinks.classList.toggle('active');
+            });
+        }
+    </script>
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            try {
+                const resp = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: new FormData(form)
+                });
+                if (resp.ok) {
+                    alert('Thanks! Check your email for confirmation.');
+                    form.reset();
+                } else {
+                    const data = await resp.json();
+                    alert(data?.error || 'Submission failed. Try again later.');
+                }
+            } catch (err) {
+                alert('Network error. Please try again later.');
+            }
         });
     </script>
-
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
